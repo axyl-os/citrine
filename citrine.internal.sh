@@ -45,7 +45,7 @@ fi
 inf "Checking pacman keyrings"
 pacman-key --init
 pacman-key --populate archlinux
-pacman-key --populate crystal
+#pacman-key --populate crystal
 
 yesno "Do you need a keyboard layout other than QWERTY US?"
 KBD="$yn"
@@ -218,12 +218,12 @@ if [[ ! "$?" == "0" ]]; then
     exit 1
 fi
 
-inf "Setting up base Crystal System"
+inf "Setting up base Arch System"
 
-pacstrap /mnt base linux linux-firmware systemd systemd-sysvcompat networkmanager man-db man-pages texinfo micro sudo curl archlinux-keyring neofetch which
+pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm
 if [[ ! "$?" == "0" ]]; then
     inf "pacstrap had some error. Retrying."
-    pacstrap /mnt base linux linux-firmware systemd systemd-sysvcompat networkmanager man-db man-pages texinfo micro sudo curl archlinux-keyring neofetch which
+    pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim nix flatpak sudo curl archlinux-keyring neofetch which
 fi
 
 if [[ "$EFI" == "yes" ]]; then
@@ -329,7 +329,7 @@ clear
 arch-chroot /mnt systemctl enable NetworkManager
 arch-chroot /mnt pacman-key --init
 arch-chroot /mnt pacman-key --populate archlinux
-arch-chroot /mnt pacman-key --populate crystal
+#arch-chroot /mnt pacman-key --populate crystal
 
 clear
 
