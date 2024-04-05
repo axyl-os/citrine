@@ -1,0 +1,53 @@
+name: build citrine
+on:
+  workflow_dispatch:
+  schedule:
+     - cron:  '0 0 */1 * *'
+  
+jobs:
+  build:
+  runs-on: ubuntu-latest
+    container:
+      image: athenaos/base-devel:latest
+      steps:
+      - name: Checkout files
+        uses: actions/checkout@v3
+      
+
+      - name: install dependencies
+        run: |
+          sudo pacman -Syu archiso
+      - name: Build Citrine
+        run: |
+          git clone https://github.com/axyl-os/citrine
+          cd citrine
+          makepkg -s --skipinteg 
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.1
+        with:
+            name: citrine
+            path: /github/home/citrine
+            if-no-files-found: warn
+            retention-days: 60
+            compression-level: 0
+            overwrite: false
+      
+      - name: Create a GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone https://github.com/axyl-os/citrine
+          cd citrine
+            gh release create citrine-"$(date +%Y.%m.%d)" --generate-notes --prerelease
+
+      - name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          cd citrine
+          for f in $(find /github/home/Axyl-Iso -name '*.iso*'); do
+            gh release upload citrine-"$(date +%Y.%m.%d)" $f --clobber
+          done
