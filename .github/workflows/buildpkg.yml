@@ -7,8 +7,7 @@ on:
 jobs:
   build:
   runs-on: ubuntu-latest
-    container:
-      image: athenaos/base-devel:latest
+    container: rubixcube199/axylos:latest
       steps:
       - name: Checkout files
         uses: actions/checkout@v3
