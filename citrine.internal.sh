@@ -336,96 +336,96 @@ clear
 mkdir -p /mnt/etc/
 cp -v /etc/pacman.conf /mnt/etc/pacman.conf
 
-arch-chroot /mnt pacman -Sy --quiet --noconfirm
+arch-chroot /mnt pacman -Syyu hyprland sddm sddm-config-editor-git archlinux-tweak-tool-git fish --quiet --noconfirm
 
-while [[ "$DE" == "" ]]; do
-    if [[ ! -f /etc/fig ]]; then
-        menu=$(dialog --title "Citrine" --menu "Select the Desktop Environment you want to install" 12 100 4 "Official" "Our pre-themed desktop environments" "Third Party (supported)" "Third party Desktop Environments that are supported" "Third Party (unsupported)" "Third Party Desktop Environments that aren't supported" "None/DIY" "Install no de from this list" --stdout)
-        if [[ "$menu" == "Official" ]]; then
-            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 1 "Onyx" "Our custom Desktop Environment based on Budgie" --stdout)
-        elif [[ "$menu" == "Third Party (supported)" ]]; then
-            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 5 "Gnome" "The Gnome desktop environment" "KDE" "The KDE desktop environment" "Xfce" "The xfce desktop environment" "budgie" "The budgie desktop environment" "Mate" "The Mate desktop environment" --stdout)
-        elif [[ "$menu" == "Third Party (unsupported)" ]]; then
-            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 1 "Enlightenment" "A very DIY desktop environment, refer to archwiki" --stdout)
-        elif [[ "$menu" == "None/DIY" ]]; then
-            yesno "Are you sure that you dont want to install any DE?"
-            if [[ "$yn" == "0" ]]; then
-                DE="none"
-                DM="none"
-            else
-                DE=""
-            fi
-        fi
-    else
-        DE="Fig"
-    fi
-    if [[ "$DE" == "Onyx" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm onyx xorg-server budgie-desktop gnome
-
-        mkdir -p /mnt/etc/skel/
-        echo "gsettings set org.gnome.desktop.interface gtk-theme \"crystal-obsidian\"" >> /mnt/etc/skel/.xsession
-        echo "gsettings set org.gnome.desktop.interface icon-theme \"crystal-obsidian-icons\"" >> /mnt/etc/skel/.xsession
-
-        DM="lightdm"
-    elif [[ "$DE" == "Gnome" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm gnome gnome-extra chrome-gnome-shell
-        DM="gdm"
-    elif [[ "$DE" == "KDE" || "$DE" == "Fig" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm plasma kde-system kde-utilities sddm
-        DM="sddm"
-    elif [[ "$DE" == "budgie" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm budgie-desktop gnome
-        DM="lightdm"
-    elif [[ "$DE" == "Mate" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm mate mate-extra mate-applet-dock mate-applet-streamer
-        DM="gdm"
-    elif [[ "$DE" == "Enlightenment" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm enlightenment terminology
-    elif [[ "$DE" == "Xfce" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm xfce4 xfce4-goodies
-        DM="lightdm"
-    fi
-done
-
-if [[ "$DM" == "" ]]; then
-    inf "Your selected DE/WM doesn't have a standard display manager. Enter one of the below names, or leave blank for none"
-    inf "- gdm"
-    inf "- sddm"
-    inf "- lightdm (you'll need a greeter package. See Arch Wiki)"
-    inf "- (you can type another Arch package name if you have one in mind)"
-    inf "- [blank] for none"
-    yesno ""
-    ND="$yn"
-    echo "ND=$ND"
-    if [[ "$ND" == "blank" || "$ND" == "none" || "$ND" == "" ]]; then
-        inf "Ok, we will skip the DM install"
-        DM=""
-    else
-        inf "Ok, we'll install $ND"
-        DM="$ND"
-        arch-chroot /mnt pacman -S --quiet --noconfirm $DM
-    fi
-else
-    if [[ "$DM" != "none" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm $DM
-    fi
-fi
-
-if [[ "$DM" != "" ]]; then
-    if [[ "$DM" == "lightdm" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm lightdm-gtk-greeter
-    fi
-    if [[ "$DM" != "none" ]]; then
-        arch-chroot /mnt systemctl enable ${DM}
-    fi
-fi
-
-if [[ "$DE" != "none" ]]; then
-    yesno "Would you like to install Firefox to go with ${DE}?"
-    if [[ "$yn" == "0" ]]; then
-        arch-chroot /mnt pacman -S --quiet --noconfirm firefox
-    fi
-fi
+#while [[ "$DE" == "" ]]; do
+#    if [[ ! -f /etc/fig ]]; then
+#        menu=$(dialog --title "Citrine" --menu "Would you like to theme Hyprland?" 12 100 4 "Yes" "Our pre-themed desktop environments" "Third Party (supported)" "Third party Desktop Environments that are supported" "Third Party (unsupported)" "Third Party Desktop Environments that aren't supported" "None/DIY" "Install no de from this list" --stdout)
+#        if [[ "$menu" == "Official" ]]; then
+#            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 1 "Onyx" "Our custom Desktop Environment based on Budgie" --stdout)
+#        elif [[ "$menu" == "Third Party (supported)" ]]; then
+#            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 5 "Gnome" "The Gnome desktop environment" "KDE" "The KDE desktop environment" "Xfce" "The xfce desktop environment" "budgie" "The budgie desktop environment" "Mate" "The Mate desktop environment" --stdout)
+#        elif [[ "$menu" == "Third Party (unsupported)" ]]; then
+#            DE=$(dialog --title "Citrine" --menu "Please choose the DE you want to install" 12 100 1 "Enlightenment" "A very DIY desktop environment, refer to archwiki" --stdout)
+#        elif [[ "$menu" == "None/DIY" ]]; then
+#            yesno "Are you sure that you dont want to install any DE?"
+#            if [[ "$yn" == "0" ]]; then
+#                DE="none"
+#                DM="none"
+#            else
+#                DE=""
+#            fi
+#        fi
+#    else
+#        DE="Fig"
+#    fi
+#    if [[ "$DE" == "Onyx" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm onyx xorg-server budgie-desktop gnome
+#
+#        mkdir -p /mnt/etc/skel/
+#        echo "gsettings set org.gnome.desktop.interface gtk-theme \"crystal-obsidian\"" >> /mnt/etc/skel/.xsession
+#        echo "gsettings set org.gnome.desktop.interface icon-theme \"crystal-obsidian-icons\"" >> /mnt/etc/skel/.xsession
+#
+#        DM="lightdm"
+#    elif [[ "$DE" == "Gnome" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm gnome gnome-extra chrome-gnome-shell
+#        DM="gdm"
+#    elif [[ "$DE" == "KDE" || "$DE" == "Fig" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm plasma kde-system kde-utilities sddm
+#        DM="sddm"
+#    elif [[ "$DE" == "budgie" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm budgie-desktop gnome
+#        DM="lightdm"
+#    elif [[ "$DE" == "Mate" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm mate mate-extra mate-applet-dock mate-applet-streamer
+#        DM="gdm"
+#    elif [[ "$DE" == "Enlightenment" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm enlightenment terminology
+#    elif [[ "$DE" == "Xfce" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm xfce4 xfce4-goodies
+#        DM="lightdm"
+#    fi
+#done
+#
+#if [[ "$DM" == "" ]]; then
+#    inf "Your selected DE/WM doesn't have a standard display manager. Enter one of the below names, or leave blank for none"
+#    inf "- gdm"
+#    inf "- sddm"
+#    inf "- lightdm (you'll need a greeter package. See Arch Wiki)"
+#    inf "- (you can type another Arch package name if you have one in mind)"
+#    inf "- [blank] for none"
+#    yesno ""
+#    ND="$yn"
+#    echo "ND=$ND"
+#    if [[ "$ND" == "blank" || "$ND" == "none" || "$ND" == "" ]]; then
+#        inf "Ok, we will skip the DM install"
+#        DM=""
+#    else
+#        inf "Ok, we'll install $ND"
+#        DM="$ND"
+#        arch-chroot /mnt pacman -S --quiet --noconfirm $DM
+#    fi
+#else
+#    if [[ "$DM" != "none" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm $DM
+#    fi
+#fi
+#
+#if [[ "$DM" != "" ]]; then
+#    if [[ "$DM" == "lightdm" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm lightdm-gtk-greeter
+#    fi
+#    if [[ "$DM" != "none" ]]; then
+#        arch-chroot /mnt systemctl enable ${DM}
+#    fi
+#fi
+#
+#if [[ "$DE" != "none" ]]; then
+#    yesno "Would you like to install Firefox to go with ${DE}?"
+#    if [[ "$yn" == "0" ]]; then
+#        arch-chroot /mnt pacman -S --quiet --noconfirm firefox
+#    fi
+#fi
 
 yesno "Would you like to install flatpak?"
 flatpak="$yn"
@@ -445,22 +445,23 @@ if [[ "$flatpak" == "0" ]]; then
     dump "Adding the flathub remote likely failed. We're sorry we can't work around this. Ask in discord if you need help."
 fi
 
-if [[ "$DE" != "Fig" ]]; then
-    arch-chroot /mnt pacman -S --quiet --noconfirm crystal-grub-theme
-    echo >> /mnt/etc/default/grub
-    echo "GRUB_THEME=\"/usr/share/grub/themes/crystal/theme.txt\"" >> /mnt/etc/default/grub
-else
-    arch-chroot /mnt pacman -S --quiet --noconfirm whitesur-grub-theme fig-configs
-    echo >> /mnt/etc/default/grub
-    echo "GRUB_THEME=\"/usr/share/grub/themes/bigsur/theme.txt\"" >> /mnt/etc/default/grub
-fi
-
+#if [[ "$DE" != "Fig" ]]; then
+#    arch-chroot /mnt pacman -S --quiet --noconfirm crystal-grub-theme
+#    echo >> /mnt/etc/default/grub
+#    echo "GRUB_THEME=\"/usr/share/grub/themes/crystal/theme.txt\"" >> /mnt/etc/default/grub
+#else
+#    arch-chroot /mnt pacman -S --quiet --noconfirm whitesur-grub-theme fig-configs
+#    echo >> /mnt/etc/default/grub
+#    echo "GRUB_THEME=\"/usr/share/grub/themes/bigsur/theme.txt\"" >> /mnt/etc/default/grub
+#fi
+#
 if [[ "$EFI" == "yes" ]]; then
-    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=crystal --removable
+    arch-chroot /mnt bootctl install --esp-path=/efi
 else 
     arch-chroot /mnt grub-install --target=i386-pc ${DISK}
+    arch-chroot /mnt grubmkconfig -o /boot/grub/grub.cfg
 fi
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+#arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 inf "Set a password for root"
 done="nope"
