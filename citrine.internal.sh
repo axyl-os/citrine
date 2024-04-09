@@ -122,9 +122,12 @@ if [[ "$MANUAL" == "no" ]]; then
 
     echo "Partitioning disk"
     if [[ "$EFI" == "yes" ]]; then
-        parted ${DISK} 'mklabel gpt' --script
-        parted ${DISK} 'mkpart primary fat32 0 300' --script
-        parted ${DISK} 'mkpart primary ext4 300 100%' --script
+         sgdisk -n1:0:+512M -t1:ef00 -c1:EFI -N2 -t2:8304 -c2:LINUXROOT ${DISK}
+         mkfs.vfat -F32 -n EFI ${DISK}p1
+         mkfs.btrfs -f -L linuxroot ${DISK}p2
+#        parted ${DISK} 'mklabel gpt' --script
+#        parted ${DISK} 'mkpart primary fat32 0 300' --script
+#        parted ${DISK} 'mkpart primary ext4 300 100%' --script
         inf "Partitioned ${DISK} as an EFI volume"
     else
         parted ${DISK} 'mklabel msdos' --script
@@ -135,11 +138,9 @@ if [[ "$MANUAL" == "no" ]]; then
     if [[ "$NVME" == "yes" ]]; then
         if [[ "$EFI" == "yes" ]]; then
             inf "Initializing ${DISK} as NVME EFI"
-            mkfs.vfat -F32 ${DISK}p1
-            mkfs.ext4 ${DISK}p2
             mount ${DISK}p2 /mnt
-            mkdir -p /mnt/boot/efi
-            mount ${DISK}p1 /mnt/boot/efi
+            mkdir /mnt/efi
+            mount ${DISK}p1 /mnt//efi
         else
             inf "Initializing ${DISK} as NVME MBR"
             mkfs.ext4 ${DISK}p1
