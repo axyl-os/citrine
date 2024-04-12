@@ -122,12 +122,8 @@ if [[ "$MANUAL" == "no" ]]; then
 
     echo "Partitioning disk"
     if [[ "$EFI" == "yes" ]]; then
+         sgdisk -Z ${DISK}
          sgdisk -n1:0:+512M -t1:ef00 -c1:EFI -N2 -t2:8304 -c2:LINUXROOT ${DISK}
-         mkfs.vfat -F32 -n EFI ${DISK}p1
-         mkfs.btrfs -f -L linuxroot ${DISK}p2
-#        parted ${DISK} 'mklabel gpt' --script
-#        parted ${DISK} 'mkpart primary fat32 0 300' --script
-#        parted ${DISK} 'mkpart primary ext4 300 100%' --script
         inf "Partitioned ${DISK} as an EFI volume"
     else
         parted ${DISK} 'mklabel msdos' --script
@@ -149,8 +145,8 @@ if [[ "$MANUAL" == "no" ]]; then
     else
         if [[ "$EFI" == "yes" ]]; then
             inf "Initializing ${DISK} as EFI"
-            mkfs.vfat -F32 ${DISK}1
-            mkfs.ext4 ${DISK}2
+            mkfs.vfat -F32 -n EFI ${DISK}1
+            mkfs.btrfs -f -L axylroot ${DISK}2
             mount ${DISK}2 /mnt
             mkdir -p /mnt/boot/efi
             mount ${DISK}1 /mnt/boot/efi
@@ -221,7 +217,7 @@ fi
 
 inf "Setting up base Arch System"
 
-pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm
+pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm fakeroot debugedit binutils vim-plugins neovim git
 if [[ ! "$?" == "0" ]]; then
     inf "pacstrap had some error. Retrying."
     pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim nix flatpak sudo curl archlinux-keyring neofetch which
