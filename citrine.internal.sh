@@ -325,7 +325,7 @@ echo "127.0.0.1     ${HOSTNAME}.localdomain ${HOSTNAME}" >> /mnt/etc/hosts
 
 clear
 
-arch-chroot /mnt systemctl enable NetworkManager
+arch-chroot /mnt systemctl enable NetworkManager sddm
 arch-chroot /mnt pacman-key --init
 arch-chroot /mnt pacman-key --populate archlinux
 #arch-chroot /mnt pacman-key --populate crystal
@@ -335,7 +335,7 @@ clear
 mkdir -p /mnt/etc/
 cp -v /etc/pacman.conf /mnt/etc/pacman.conf
 
-arch-chroot /mnt pacman -Syyu hyprland sddm sddm-config-editor-git archlinux-tweak-tool-git fish zsh --quiet --noconfirm
+#arch-chroot /mnt pacman -Syyu hyprland sddm sddm-config-editor-git archlinux-tweak-tool-git fish zsh --quiet --noconfirm
 
 #while [[ "$DE" == "" ]]; do
 #    if [[ ! -f /etc/fig ]]; then
