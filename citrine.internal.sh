@@ -120,16 +120,18 @@ if [[ "$MANUAL" == "no" ]]; then
     dumptitle="CAUTION!"
     dump "This is your last chance to avoid deleting critical data on $DISK. If you're not sure, press Control+C NOW!"
 
-    echo "Partitioning disk"
+     echo "Partitioning disk"
     if [[ "$EFI" == "yes" ]]; then
-         sgdisk -Z ${DISK}
-         sgdisk -n1:0:+512M -t1:ef00 -c1:EFI -N2 -t2:8304 -c2:LINUXROOT ${DISK}
+        parted ${DISK} 'mklabel gpt' --script
+        parted ${DISK} 'mkpart primary fat32 0 300' --script
+        parted ${DISK} 'mkpart primary ext4 300 100%' --script
         inf "Partitioned ${DISK} as an EFI volume"
     else
         parted ${DISK} 'mklabel msdos' --script
         parted ${DISK} 'mkpart primary ext4 1 -1' --script
         inf "Partitioned ${DISK} as an MBR volume"
     fi
+
 
     if [[ "$NVME" == "yes" ]]; then
         if [[ "$EFI" == "yes" ]]; then
@@ -333,7 +335,7 @@ clear
 mkdir -p /mnt/etc/
 cp -v /etc/pacman.conf /mnt/etc/pacman.conf
 
-arch-chroot /mnt pacman -Syyu hyprland sddm sddm-config-editor-git archlinux-tweak-tool-git fish --quiet --noconfirm
+arch-chroot /mnt pacman -Syyu hyprland sddm sddm-config-editor-git archlinux-tweak-tool-git fish zsh --quiet --noconfirm
 
 #while [[ "$DE" == "" ]]; do
 #    if [[ ! -f /etc/fig ]]; then
@@ -442,23 +444,13 @@ if [[ "$flatpak" == "0" ]]; then
     dump "Adding the flathub remote likely failed. We're sorry we can't work around this. Ask in discord if you need help."
 fi
 
-#if [[ "$DE" != "Fig" ]]; then
-#    arch-chroot /mnt pacman -S --quiet --noconfirm crystal-grub-theme
-#    echo >> /mnt/etc/default/grub
-#    echo "GRUB_THEME=\"/usr/share/grub/themes/crystal/theme.txt\"" >> /mnt/etc/default/grub
-#else
-#    arch-chroot /mnt pacman -S --quiet --noconfirm whitesur-grub-theme fig-configs
-#    echo >> /mnt/etc/default/grub
-#    echo "GRUB_THEME=\"/usr/share/grub/themes/bigsur/theme.txt\"" >> /mnt/etc/default/grub
-#fi
-#
+
 if [[ "$EFI" == "yes" ]]; then
-    arch-chroot /mnt bootctl install --esp-path=/efi
+    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=crystal --removable
 else 
     arch-chroot /mnt grub-install --target=i386-pc ${DISK}
-    arch-chroot /mnt grubmkconfig -o /boot/grub/grub.cfg
 fi
-#arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 inf "Set a password for root"
 done="nope"
