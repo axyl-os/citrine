@@ -446,11 +446,12 @@ fi
 
 
 if [[ "$EFI" == "yes" ]]; then
-    arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=crystal --removable
+    arch-chroot /mnt  bootctl install
+    #arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=crystal --removable
 else 
     arch-chroot /mnt grub-install --target=i386-pc ${DISK}
+    arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 fi
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 inf "Set a password for root"
 done="nope"
