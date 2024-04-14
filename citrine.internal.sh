@@ -219,10 +219,10 @@ fi
 
 inf "Setting up base Arch System"
 
-pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm fakeroot debugedit binutils vim-plugins neovim git
+pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm fakeroot grub debugedit binutils vim-plugins neovim git
 if [[ ! "$?" == "0" ]]; then
     inf "pacstrap had some error. Retrying."
-    pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim nix flatpak sudo curl archlinux-keyring neofetch which
+    pacstrap /mnt base base-devel linux-zen linux-firmware linux-zen-headers networkmanager man-db man-pages texinfo micro neovim vim nix flatpak sudo kitty curl archlinux-keyring neofetch which hyprland sddm fakeroot grub debugedit binutils vim-plugins neovim git
 fi
 
 if [[ "$EFI" == "yes" ]]; then
